@@ -4,16 +4,22 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"myGoSiteProject/app/controller"
+	"myGoSiteProject/app/server"
 	"net/http"
 )
 
 func main() {
+
+	err := server.InitDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	//создаем и запускаем в работу роутер для обслуживания запросов
 	r := httprouter.New()
 	routes(r)
 	//прикрепляемся к хосту и свободному порту для приема и обслуживания входящих запросов
 	//вторым параметром передается роутер, который будет работать с запросами
-	err := http.ListenAndServe("localhost:4444", r)
+	err = http.ListenAndServe("localhost:4444", r)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,4 +31,7 @@ func routes(r *httprouter.Router) {
 	//что следует выполнять при входящих запросах указанного типа и по указанному адресу
 	r.GET("/", controller.StartPage)
 	r.GET("/users", controller.GetUsers)
+	r.POST("/user/add", controller.AddUser)
+	r.DELETE("/user/delete/:userId", controller.DeleteUser)
+	r.PATCH("/user/update/:userId",controller.UpdateUser)
 }
